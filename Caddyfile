@@ -1,0 +1,5 @@
+# 이 주소로 오는 요청을 HTTPS로 받아서 우리 앱(app:8000)으로 넘겨줌
+# 인증서(자물쇠)는 Caddy가 Let's Encrypt에서 자동으로 발급/갱신
+{$DOMAIN} {
+	reverse_proxy app:8000
+}

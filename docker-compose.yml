@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    container_name: ijae-app
+    restart: unless-stopped        # 서버 재부팅돼도 자동으로 다시 켜짐
+    expose:
+      - "8000"                     # 밖에 직접 공개 안 함 (caddy만 접근)
+    volumes:
+      - ./data:/data               # 기록(feeding.db)을 서버 디스크에 보관
+    environment:
+      - TZ=Asia/Seoul
+      - API_KEY=${API_KEY}         # .env 파일의 비밀 키
+
+  caddy:
+    image: caddy:2
+    container_name: ijae-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"                    # HTTP (자동으로 HTTPS로 넘겨줌)
+      - "443:443"                  # HTTPS
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data           # 발급받은 인증서 보관
+      - caddy_config:/config
+    environment:
+      - DOMAIN=${DOMAIN}           # .env 파일의 주소
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:
